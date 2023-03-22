@@ -14,7 +14,46 @@ export class StepsStack extends cdk.Stack {
             code: lambda.Code.fromAsset(join(__dirname, '..','services','hello')),
             handler: 'hello.main'
         })
-        
+  
+  
+  const taskFn1 = new sfn.Task(this, 'Function 1',{
+    task: new tasks.RunLambdaTask(helloFunction, {
+      payload: sfn.TaskInput.fromObject({})
+    }),
+    resultPath: '$.guid',
+  })
+  
+  const taskFn2 = new sfn.Task(this, 'Function 2',{
+    task: new tasks.RunLambdaTask(helloFunction, {
+      payload: sfn.TaskInput.fromDataAt('$.guid')
+    }),
+    resultPath: '$.guid',
+  })
+  
+  const taskFn3 = new sfn.Task(this, 'Function 3',{
+    task: new tasks.RunLambdaTask(helloFunction, {
+      payload: sfn.TaskInput.fromDataAt('$.guid')
+    }),
+    resultPath: '$.guid',
+  })
+  
+  const taskFn4 = new sfn.Task(this, 'Function 4',{
+    task: new tasks.RunLambdaTask(helloFunction, {
+      payload: sfn.TaskInput.fromDataAt('$.guid')
+    }),
+    resultPath: '$.guid',
+  })
+  
+  const definition = taskFn1
+    .next(taskFn2)
+    .next(taskFn3)
+    .next(taskFn4);
+  
+  
+  new sfn.StateMachine(this, 'StateMachine',{
+    definition,
     
-  }
+  })
+  
+}
 }
